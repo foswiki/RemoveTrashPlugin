@@ -85,7 +85,7 @@ MESSAGE
     if ($@) {
         $message .= "There was a compile error: $@\n";
     }
-    elsif (defined $return) {
+    elsif ( defined $return ) {
         $message .= "There was a file error: $!\n";
     }
     else {
@@ -134,7 +134,8 @@ sub postinstall {
     # # No POSTINSTALL script;
 }
 
-Foswiki::Extender::install( $PACKAGES_URL, 'RemoveTrashPlugin', 'RemoveTrashPlugin', @DATA );
+Foswiki::Extender::install( $PACKAGES_URL, 'RemoveTrashPlugin',
+    'RemoveTrashPlugin', @DATA );
 
 1;
 
