@@ -23,7 +23,7 @@ our $RELEASE = '0.1.0';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
-our $SHORTDESCRIPTION = 'A simple plugin for \'emptying\' the Trash web.';;
+our $SHORTDESCRIPTION = 'A simple plugin for \'emptying\' the Trash web.';
 
 # You must set $NO_PREFS_IN_TOPIC to 0 if you want your plugin to use
 # preferences set in the plugin topic. This is required for compatibility
@@ -71,13 +71,15 @@ sub initPlugin {
 
     # Always provide a default in case the setting is not defined in
     # LocalSite.cfg.
-    $foswikidir = $Foswiki::cfg{Plugins}{RemoveTrashPlugin}{FoswikiRoot} || '/var/www/foswiki';
+    $foswikidir = $Foswiki::cfg{Plugins}{RemoveTrashPlugin}{FoswikiRoot}
+      || '/var/www/foswiki';
 
     # Register the _REMOVETRASH function to handle %REMOVETRASH{...}%
     Foswiki::Func::registerTagHandler( 'REMOVETRASH', \&_REMOVETRASH );
 
     # Register the removetrash REST alias
-    Foswiki::Func::registerRESTHandler('removetrash', \&remove_trash, http_allow => 'GET');
+    Foswiki::Func::registerRESTHandler( 'removetrash', \&remove_trash,
+        http_allow => 'GET' );
 
     # Plugin correctly initialized
     return 1;
@@ -85,8 +87,13 @@ sub initPlugin {
 
 sub remove_trash {
 
-    if (defined $user) {
-        if ( !Foswiki::Func::isGroupMember( "AdminGroup", $user, { expand => 0 } )) {
+    if ( defined $user ) {
+        if (
+            !Foswiki::Func::isGroupMember(
+                "AdminGroup", $user, { expand => 0 }
+            )
+          )
+        {
             if (DEBUG) {
                 Foswiki::Func::writeDebug(
                     "Current user not a member of AdminGroup, exiting.");
@@ -95,13 +102,14 @@ sub remove_trash {
         }
     }
 
-    if (!defined $foswikidir) {
+    if ( !defined $foswikidir ) {
         $foswikidir = '/var/www/foswiki';
     }
 
-    my @directories = ( $foswikidir . '/data/Trash', $foswikidir . '/pub/Trash/' );
+    my @directories =
+      ( $foswikidir . '/data/Trash', $foswikidir . '/pub/Trash/' );
 
-    finddepth({wanted => \&remove_item, untaint => 1}, @directories);
+    finddepth( { wanted => \&remove_item, untaint => 1 }, @directories );
 
     my $report;
 
@@ -110,7 +118,8 @@ sub remove_trash {
         foreach my $item (@removed_items) {
             $report = $report . "   * $item<br/>";
         }
-    } else {
+    }
+    else {
         $report = 'No items were removed.';
     }
 
@@ -123,10 +132,11 @@ sub remove_item {
     my $file = $File::Find::name;
 
     # Don't remove certain files and directories.
-    if ($file =~ m|Trash/Web[^/]+$| ||
-        $file =~ m|Trash/.changes$| ||
-        $file =~ m|Trash$|          ||
-        $file =~ m|TrashAttachment$|) {
+    if (   $file =~ m|Trash/Web[^/]+$|
+        || $file =~ m|Trash/.changes$|
+        || $file =~ m|Trash$|
+        || $file =~ m|TrashAttachment$| )
+    {
         return;
     }
 
@@ -140,15 +150,17 @@ sub remove_item {
 
     undef $!;
 
-    if (-f $file) {
+    if ( -f $file ) {
         unlink $file;
-    } elsif (-d $file) {
+    }
+    elsif ( -d $file ) {
         rmdir $file;
     }
 
-    if ($! && DEBUG) {
+    if ( $! && DEBUG ) {
         Foswiki::Func::writeDebug("Couldn't remove $file; error was '$!'");
-    } else {
+    }
+    else {
         push @removed_items, $file;
     }
 
@@ -157,7 +169,8 @@ sub remove_item {
 # The function used to handle the %REMOVETRASH{...}% macro.
 
 sub _REMOVETRASH {
-    my($session, $params, $topic, $web, $topicObject) = @_;
+    my ( $session, $params, $topic, $web, $topicObject ) = @_;
+
     # $session  - a reference to the Foswiki session object
     #             (you probably won't need it, but documented in Foswiki.pm)
     # $params=  - a reference to a Foswiki::Attrs object containing
@@ -176,7 +189,8 @@ sub _REMOVETRASH {
     # $params->{_DEFAULT} will be 'hamburger'
     # $params->{sideorder} will be 'onions'
 
-    my $button = "<a class='foswikiButton' href='$Foswiki::cfg{ScriptUrlPath}/rest/RemoveTrashPlugin/removetrash'>Remove trash</a>";
+    my $button =
+"<a class='foswikiButton' href='$Foswiki::cfg{ScriptUrlPath}/rest/RemoveTrashPlugin/removetrash'>Remove trash</a>";
 
     return $button;
 
